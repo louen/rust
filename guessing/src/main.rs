@@ -19,42 +19,58 @@ fn main() {
     let secret_number = rand::thread_rng().gen_range(1,101);
 
 
-    // Let statements declare a variable.
-    // Variable are const by default so `let mut` declares a *mutable* variable
-    // `new` function is a convention for a static constructor
-    let mut guess = String::new();
+
+    // This is a while(true) kinda loop
+    loop {
+
+        // Let statements declare a variable.
+        // Variable are const by default so `let mut` declares a *mutable* variable
+        // `new` function is a convention for a static constructor
+        let mut guess = String::new();
 
 
-    // io::stin is a handle for the standard input
-    // we pass a reference to guess as argument to read line.
-    // but references are const by default, hence the need for &mut (instead of just &)
-    io::stdin().read_line(&mut guess).expect("Failed to read !");
+        // io::stin is a handle for the standard input
+        // we pass a reference to guess as argument to read line.
+        // but references are const by default, hence the need for &mut (instead of just &)
+        io::stdin().read_line(&mut guess).expect("Failed to read !");
 
-    // read_line retunrs a `io::Result` (an instange of a generic Result type which
-    // is an enum (Ok or Err). Results have `expect()`  method which is an assert.
-    // Not calling expect() will generate a warning.
-
-
-    // {} are placeholders in a string. They are replaced by the variables
-    // values in order of their appearance in println().
-    println!("Your guess is {}", guess);
+        // read_line retunrs a `io::Result` (an instange of a generic Result type which
+        // is an enum (Ok or Err). Results have `expect()`  method which is an assert.
+        // Not calling expect() will generate a warning.
 
 
-    // Declare a variable with type (u32) by *shadowing* the previous declaration
-    // of `guess`.
-    // `trim()` removes the whitespace (e.g. the newline read from stdin)
-    // `parse()` converts it to a number (coercing in u32 because we declared
-    // the variable with a specific type). Note that this coerces secret_number
-    // to u32 as well.
-    let guess: u32 = guess.trim().parse().expect("Failed to parse input");
+        // {} are placeholders in a string. They are replaced by the variables
+        // values in order of their appearance in println().
+        println!("Your guess is {}", guess);
 
-    // cmp method called to compare secret_number with guess.
-    // match statement is similar to switch() (note the comma between statements)
-    match guess.cmp(&secret_number) {
-        Ordering::Less    => println!("too small"),
-        Ordering::Greater => println!("too big"),
-        Ordering::Equal   => println!("a winner is you"),
+
+        // Declare a variable with type (u32) by *shadowing* the previous declaration
+        // of `guess`.
+        // `trim()` removes the whitespace (e.g. the newline read from stdin)
+        // `parse()` converts it to a number (coercing in u32 because we declared
+        // the variable with a specific type). Note that this coerces secret_number
+        // to u32 as well.
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+        // Here we replaced the `expect()` to a match statement which also yields the
+        // value `num` in case of success.
+        // Here _ is a wildcard placeholder (matches all Err values)
+
+
+
+        // cmp method called to compare secret_number with guess.
+        // match statement is similar to switch() (note the comma between statements)
+        match guess.cmp(&secret_number) {
+            Ordering::Less    => println!("too small"),
+            Ordering::Greater => println!("too big"),
+            Ordering::Equal   => {
+                println!("a winner is you");
+                break;// Break out of the `loop` (not out of the switch statement !)
+            }
+        }
+
     }
-
 
 }
